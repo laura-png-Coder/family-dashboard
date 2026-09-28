@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ふぁみりー だっしゅぼーど ぴんく</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: M PLUS Rounded 1c -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        rounded: ['"M PLUS Rounded 1c"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: #fff1f2;
+            background-image: radial-gradient(#fecdd3 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+        .glow-text {
+            text-shadow: 0 0 12px rgba(244, 114, 182, 0.3);
+        }
+    </style>
+</head>
+<body class="text-pink-950 min-h-screen font-rounded flex flex-col justify-between overflow-x-hidden p-3 md:p-6" id="appBody">
+
+    <!-- Top Header & Clock Area -->
+    <header class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center mb-4">
+        <!-- Date & Time Box -->
+        <div class="md:col-span-7 bg-white/90 backdrop-blur-sm p-4 md:p-5 rounded-3xl shadow-lg border-2 border-pink-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="bg-pink-400 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm"><i class="fa-solid fa-heart mr-1"></i>きょう</span>
+                    <span class="text-pink-700 text-sm md:text-base font-extrabold" id="fullDateText">----ねん --がつ --にち</span>
+                </div>
+                <div class="text-4xl md:text-6xl font-extrabold tracking-tight text-pink-500 font-mono glow-text" id="clockText">
+                    00:00<span class="text-2xl md:text-3xl ml-1 text-pink-300" id="secondsText">:00</span>
+                </div>
+            </div>
+            <div class="text-right sm:border-l-2 sm:border-pink-100 sm:pl-6 w-full sm:w-auto">
+                <div class="text-lg md:text-2xl font-black text-pink-600" id="greetingMessage">
+                    おはようございます！
+                </div>
+                <div class="text-xs md:text-sm text-pink-400 font-bold mt-1" id="locationName">
+                    <i class="fa-solid fa-location-dot mr-1 text-pink-400"></i>ひたちおおみや
+                </div>
+            </div>
+        </div>
+
+        <!-- Trivia / Message Box -->
+        <div class="md:col-span-5 bg-gradient-to-r from-pink-200/80 to-rose-100/80 border-2 border-pink-300 p-4 md:p-5 rounded-3xl shadow-lg flex items-center gap-4 relative overflow-hidden min-h-[105px]">
+            <div class="bg-pink-400 text-white p-3.5 rounded-2xl text-2xl flex-shrink-0 shadow-md">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="flex-grow">
+                <div class="text-xs font-black text-pink-500 uppercase tracking-wider mb-1"><i class="fa-solid fa-star mr-1"></i>きょうの まめちしき</div>
+                <div class="text-sm md:text-base font-extrabold leading-snug line-clamp-2 text-pink-900" id="triviaText">
+                    ロードちゅう...
+                </div>
+            </div>
+            <button id="refreshTriviaBtn" class="absolute top-3 right-3 text-pink-400 hover:text-pink-600 p-1 transition" title="べつの ちしきを見る">
+                <i class="fa-solid fa-rotate text-xs"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-grow mb-4">
+        
+        <!-- Left Panel: Weather -->
+        <section class="lg:col-span-4 flex flex-col gap-4">
+            <div class="bg-white/90 backdrop-blur-sm p-5 rounded-3xl shadow-lg border-2 border-pink-200 flex-grow flex flex-col justify-between relative overflow-hidden">
+                
+                <div class="flex justify-between items-center mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl text-pink-400"><i class="fa-solid fa-cloud-sun"></i></span>
+                        <h2 class="text-lg font-black text-pink-800" id="weatherTitle">きょうの てんき</h2>
+                    </div>
+                    <button id="weatherToggleBtn" class="bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs px-3 py-1.5 rounded-full border border-pink-300 transition flex items-center gap-1 font-bold shadow-sm">
+                        <i class="fa-solid fa-arrows-rotate text-pink-500"></i>
+                        <span id="weatherToggleText">あしたを見る</span>
+                    </button>
+                </div>
+
+                <!-- Main Weather Card -->
+                <div class="flex items-center justify-around py-4 my-auto bg-pink-50/70 rounded-2xl p-4 border border-pink-200/80">
+                    <div class="text-center">
+                        <div class="text-6xl md:text-7xl mb-2 filter drop-shadow-md" id="weatherIcon">
+                            <i class="fa-solid fa-sun text-amber-400"></i>
+                        </div>
+                        <div class="text-2xl font-black text-pink-600" id="weatherStatusText">はれ</div>
+                    </div>
+                    <div class="space-y-2 text-right">
+                        <div>
+                            <span class="text-xs text-pink-400 font-bold block">さいこう きおん</span>
+                            <span class="text-2xl md:text-3xl font-black text-rose-500" id="maxTemp">--℃</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-pink-400 font-bold block">さいてい きおん</span>
+                            <span class="text-2xl md:text-3xl font-black text-sky-400" id="minTemp">--℃</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Details Footer -->
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <div class="bg-pink-50/70 p-3 rounded-2xl text-center border border-pink-200/80">
+                        <div class="text-xs text-pink-400 font-bold mb-1"><i class="fa-solid fa-umbrella text-blue-400 mr-1"></i>かさの ひつよう</div>
+                        <div class="text-base font-black text-pink-700" id="rainUmbrellaAdvice">いらないよ</div>
+                    </div>
+                    <div class="bg-pink-50/70 p-3 rounded-2xl text-center border border-pink-200/80">
+                        <div class="text-xs text-pink-400 font-bold mb-1"><i class="fa-solid fa-droplet text-cyan-400 mr-1"></i>こうすい かくりつ</div>
+                        <div class="text-base font-black text-sky-500" id="rainProbability">-- %</div>
+                    </div>
+                </div>
+
+                <div id="nightNotice" class="mt-3 text-center bg-purple-100 border border-purple-200 text-purple-700 text-xs py-1.5 px-3 rounded-xl font-bold hidden">
+                    <i class="fa-solid fa-moon text-purple-400 mr-1"></i> 18じを すぎたので「あしたの てんき」を ひょうじしています
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Right Panel: Weekly Schedule & Recurring Events -->
+        <section class="lg:col-span-8 flex flex-col gap-4">
+            <div class="bg-white/90 backdrop-blur-sm p-5 rounded-3xl shadow-lg border-2 border-pink-200 flex-grow flex flex-col">
+                
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl text-pink-400"><i class="fa-solid fa-calendar-heart"></i></span>
+                        <h2 class="text-lg font-black text-pink-800">こんしゅうの よてい</h2>
+                        <span id="gcalStatus" class="text-[10px] bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full font-bold">Googleカレンダー未設定</span>
+                    </div>
+                    <button id="syncGCalBtn" class="bg-pink-100 hover:bg-pink-200 text-pink-700 text-xs px-3 py-1.5 rounded-2xl font-black border border-pink-300 transition flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-rotate text-pink-500"></i> さいしんをこうしん
+                    </button>
+                </div>
+
+                <!-- 7-Day Grid Container -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-2.5 flex-grow" id="weeklyGrid">
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Footer -->
+    <footer class="flex justify-between items-center bg-white/80 backdrop-blur-sm px-5 py-3 rounded-2xl border border-pink-200 text-xs text-pink-400 shadow-sm">
+        <div class="flex items-center gap-3">
+            <button id="openSettingsBtn" class="hover:text-pink-700 flex items-center gap-1 font-bold text-pink-600 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-xl border border-pink-200 transition">
+                <i class="fa-solid fa-gear text-pink-400"></i> せってい
+            </button>
+            <button id="fullscreenBtn" class="hover:text-pink-700 flex items-center gap-1 font-bold text-pink-600 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-xl border border-pink-200 transition">
+                <i class="fa-solid fa-expand text-pink-400"></i> ぜんめんひょうじ
+            </button>
+        </div>
+        <div class="hidden sm:block font-extrabold text-pink-400">
+            ふぁみりー だっしゅぼーど 🎀
+        </div>
+    </footer>
+
+    <!-- MODAL: Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-pink-950/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-xl border-2 border-pink-200 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-black text-pink-600"><i class="fa-solid fa-sliders mr-2"></i>ダッシュボードの せってい</h3>
+                <button id="closeSettingsModalBtn" class="text-pink-300 hover:text-pink-500 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-5">
+                <!-- Google Calendar Settings -->
+                <div class="bg-rose-50/80 p-4 rounded-2xl border border-rose-200">
+                    <h4 class="font-black text-sm text-rose-700 mb-1"><i class="fa-calendar-days fa-solid mr-1"></i> Googleカレンダー れんけい</h4>
+                    <p class="text-[11px] text-rose-500 font-bold mb-3">Googleカレンダーの予定を自動で読み込みます</p>
+                    <div class="space-y-2">
+                        <div>
+                            <label class="block text-xs text-rose-700 font-bold mb-1">Google API キー</label>
+                            <input type="text" id="settingApiKey" placeholder="AIzaSy..." class="w-full bg-white border border-rose-200 rounded-xl px-3 py-1.5 text-xs text-pink-900 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-rose-700 font-bold mb-1">カレンダー ID</label>
+                            <input type="text" id="settingCalendarId" placeholder="xxx@group.calendar.google.com" class="w-full bg-white border border-rose-200 rounded-xl px-3 py-1.5 text-xs text-pink-900 font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Setting -->
+                <div class="bg-pink-50/80 p-4 rounded-2xl border border-pink-200">
+                    <h4 class="font-black text-sm text-pink-700 mb-2"><i class="fa-solid fa-location-dot mr-1"></i> てんきの ばしょ（地域）</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs text-pink-500 font-bold mb-1">いど (Latitude)</label>
+                            <input type="number" step="0.0001" id="settingLat" class="w-full bg-white border border-pink-200 rounded-xl px-3 py-1.5 text-xs text-pink-900">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-pink-500 font-bold mb-1">けいど (Longitude)</label>
+                            <input type="number" step="0.0001" id="settingLng" class="w-full bg-white border border-pink-200 rounded-xl px-3 py-1.5 text-xs text-pink-900">
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <label class="block text-xs text-pink-500 font-bold mb-1">ばしょの なまえ</label>
+                        <input type="text" id="settingCityName" placeholder="ひたちおおみや" class="w-full bg-white border border-pink-200 rounded-xl px-3 py-1.5 text-xs text-pink-900">
+                    </div>
+                </div>
+
+                <!-- Recurring Schedule Setting -->
+                <div class="bg-pink-50/80 p-4 rounded-2xl border border-pink-200">
+                    <h4 class="font-black text-sm text-pink-700 mb-2"><i class="fa-solid fa-arrows-rotate mr-1"></i> くりかえしの よてい（まいしゅう）</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" id="recurringSettingsList">
+                    </div>
+                </div>
+
+                <!-- Save & Reset -->
+                <div class="flex justify-between items-center pt-2 border-t border-pink-100">
+                    <button id="resetDataBtn" class="text-rose-400 hover:text-rose-600 text-xs font-bold underline">
+                        データをリセット
+                    </button>
+                    <button id="saveSettingsBtn" class="bg-pink-500 hover:bg-pink-600 text-white font-extrabold px-6 py-2 rounded-xl text-sm shadow-md">
+                        ほぞんして とじる
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_CONFIG = {
+            cityName: 'ひたちおおみや',
+            lat: 36.5426,
+            lng: 140.4110,
+            apiKey: '',
+            calendarId: '',
+            recurringSchedule: {
+                0: 'なし', 1: 'ならいごと', 2: 'なし', 3: 'ならいごと', 4: 'なし', 5: 'なし', 6: 'なし'
+            }
+        };
+
+        const HIRAGANA_WEEKDAYS = ['にちようび', 'げつようび', 'かようび', 'すいようび', 'もくようび', 'きんようび', 'どようび'];
+        const SHORT_WEEKDAYS = ['にち', 'げつ', 'か', 'すい', 'もく', 'きん', 'ど'];
+
+        const TRIVIA_LIST = [
+            "キリンの くびの ほねは、にんげんと おなじ 7こ なんだよ！",
+            "ラッコは ながされないように てをつないで ねむるよ！",
+            "バナナは すいとうみたいに 木じゃなくて「くさ」に なるんだよ！",
+            "パンダの しっぽは じつは しろいんだよ！",
+            "ネコが グルグル なくのは、しあわせな ときなんだよ！",
+            "イルカは かたほうの めを あけたまま ねむるよ！",
+            "アリは おちてきても ぜんぜん いたくないんだよ！",
+            "フラミンゴが ピンク色なのは エビや モを たべているからだよ！"
+        ];
+
+        let appConfig = JSON.parse(localStorage.getItem('family_dash_config')) || DEFAULT_CONFIG;
+        let gcalEvents = [];
+        let weatherData = null;
+        let isNightForecast = false;
+        let isManualWeatherMode = false;
+
+        function updateClock() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            const dayIdx = now.getDay();
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            document.getElementById('fullDateText').textContent = `${year}ねん ${month}がつ ${date}にち (${SHORT_WEEKDAYS[dayIdx]})`;
+            document.getElementById('clockText').childNodes[0].nodeValue = `${hours}:${minutes}`;
+            document.getElementById('secondsText').textContent = `:${seconds}`;
+
+            const currentHour = now.getHours();
+            const greetingEl = document.getElementById('greetingMessage');
+            const nightNoticeEl = document.getElementById('nightNotice');
+
+            if (currentHour >= 5 && currentHour < 11) {
+                greetingEl.textContent = 'おはようございます！';
+            } else if (currentHour >= 11 && currentHour < 17) {
+                greetingEl.textContent = 'こんにちは！';
+            } else {
+                greetingEl.textContent = 'きょうも いちにち おつかれさま！';
+            }
+
+            if (!isManualWeatherMode) {
+                if (currentHour >= 18 || currentHour < 5) {
+                    if (!isNightForecast) {
+                        isNightForecast = true;
+                        updateWeatherUI();
+                    }
+                    nightNoticeEl.classList.remove('hidden');
+                } else {
+                    if (isNightForecast) {
+                        isNightForecast = false;
+                        updateWeatherUI();
+                    }
+                    nightNoticeEl.classList.add('hidden');
+                }
+            }
+        }
+
+        function getRandomTrivia() {
+            const idx = Math.floor(Math.random() * TRIVIA_LIST.length);
+            document.getElementById('triviaText').textContent = TRIVIA_LIST[idx];
+        }
+
+        async function fetchWeather() {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${appConfig.lat}&longitude=${appConfig.lng}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('Weather fetch failed');
+                weatherData = await res.json();
+                updateWeatherUI();
+            } catch (err) {
+                console.error("Weather error:", err);
+            }
+        }
+
+        function translateWMO(code) {
+            if (code === 0) return { text: 'はれ', icon: '<i class="fa-solid fa-sun text-amber-400"></i>' };
+            if (code >= 1 && code <= 3) return { text: 'くもり', icon: '<i class="fa-solid fa-cloud-sun text-pink-300"></i>' };
+            if (code >= 51 && code <= 67) return { text: 'あめ', icon: '<i class="fa-solid fa-cloud-showers-heavy text-blue-400"></i>' };
+            if (code >= 71 && code <= 77) return { text: 'ゆき', icon: '<i class="fa-solid fa-snowflake text-cyan-300"></i>' };
+            return { text: 'はれ', icon: '<i class="fa-solid fa-sun text-amber-400"></i>' };
+        }
+
+        function updateWeatherUI() {
+            if (!weatherData || !weatherData.daily) return;
+            const targetIdx = isNightForecast ? 1 : 0;
+            
+            document.getElementById('weatherTitle').textContent = isNightForecast ? 'あしたの てんき' : 'きょうの てんき';
+            document.getElementById('weatherToggleText').textContent = isNightForecast ? 'きょうを見る' : 'あしたを見る';
+
+            const wCode = weatherData.daily.weathercode[targetIdx];
+            const maxT = Math.round(weatherData.daily.temperature_2m_max[targetIdx]);
+            const minT = Math.round(weatherData.daily.temperature_2m_min[targetIdx]);
+            const rainProb = weatherData.daily.precipitation_probability_max[targetIdx] || 0;
+            const info = translateWMO(wCode);
+
+            document.getElementById('weatherIcon').innerHTML = info.icon;
+            document.getElementById('weatherStatusText').textContent = info.text;
+            document.getElementById('maxTemp').textContent = `${maxT}℃`;
+            document.getElementById('minTemp').textContent = `${minT}℃`;
+            document.getElementById('rainProbability').textContent = `${rainProb} %`;
+            document.getElementById('rainUmbrellaAdvice').textContent = rainProb >= 40 ? 'かさを持ってね！' : 'いらないよ';
+            document.getElementById('locationName').innerHTML = `<i class="fa-solid fa-location-dot mr-1 text-pink-400"></i>${appConfig.cityName}`;
+        }
+
+        async function fetchGoogleCalendarEvents() {
+            const statusEl = document.getElementById('gcalStatus');
+            if (!appConfig.apiKey || !appConfig.calendarId) {
+                statusEl.textContent = 'Googleカレンダー未設定';
+                statusEl.className = 'text-[10px] bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full font-bold';
+                return;
+            }
+
+            statusEl.textContent = 'よみこみちゅう...';
+            statusEl.className = 'text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold';
+
+            const now = new Date();
+            const timeMin = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+            const timeMax = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 8).toISOString();
+
+            const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(appConfig.calendarId)}/events?key=${appConfig.apiKey}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('GCal fetch error');
+                const data = await res.json();
+                
+                gcalEvents = (data.items || []).map(item => {
+                    const start = item.start.date || item.start.dateTime.split('T')[0];
+                    return {
+                        date: start,
+                        title: item.summary || 'よてい'
+                    };
+                });
+
+                statusEl.textContent = 'Google連携中';
+                statusEl.className = 'text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold';
+                renderWeeklyGrid();
+            } catch (err) {
+                console.error("GCal error:", err);
+                statusEl.textContent = 'せっていエラー';
+                statusEl.className = 'text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full font-bold';
+            }
+        }
+
+        function renderWeeklyGrid() {
+            const grid = document.getElementById('weeklyGrid');
+            grid.innerHTML = '';
+            const today = new Date();
+
+            for (let i = 0; i < 7; i++) {
+                const targetDate = new Date(today);
+                targetDate.setDate(today.getDate() + i);
+
+                const year = targetDate.getFullYear();
+                const monthStr = String(targetDate.getMonth() + 1).padStart(2, '0');
+                const dayStr = String(targetDate.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${monthStr}-${dayStr}`;
+
+                const month = targetDate.getMonth() + 1;
+                const dayNum = targetDate.getDate();
+                const dayOfWeek = targetDate.getDay();
+
+                const isToday = i === 0;
+                const recurringSchedule = appConfig.recurringSchedule || {};
+                const recurringText = recurringSchedule[dayOfWeek] || 'なし';
+                
+                const dayEvents = gcalEvents.filter(e => e.date === dateStr);
+
+                let cardBgClass = 'bg-white/80 border-pink-100';
+                let dateBadgeClass = 'bg-pink-100 text-pink-700';
+                
+                if (isToday) {
+                    cardBgClass = 'bg-white border-2 border-pink-400 shadow-pink-200 shadow-md';
+                    dateBadgeClass = 'bg-pink-400 text-white font-extrabold';
+                } else if (dayOfWeek === 0) {
+                    dateBadgeClass = 'bg-rose-100 text-rose-600 border border-rose-200';
+                } else if (dayOfWeek === 6) {
+                    dateBadgeClass = 'bg-sky-100 text-sky-600 border border-sky-200';
+                }
+
+                const cardHTML = `
+                    <div class="rounded-2xl p-3 border flex flex-col justify-between ${cardBgClass}">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs px-2 py-0.5 rounded-lg font-extrabold ${dateBadgeClass}">
+                                    ${month}/${dayNum} (${SHORT_WEEKDAYS[dayOfWeek]})
+                                </span>
+                                ${isToday ? '<span class="text-[10px] text-pink-500 font-black uppercase tracking-wider">きょう</span>' : ''}
+                            </div>
+
+                            ${recurringText !== 'なし' && recurringText !== '' ? `
+                                <div class="bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold py-1 px-2 rounded-xl mb-2 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-arrows-rotate text-rose-400 text-xs"></i>
+                                    <span class="truncate">${recurringText}</span>
+                                </div>
+                            ` : ''}
+
+                            <div class="space-y-1.5 mt-2">
+                                ${dayEvents.length > 0 ? dayEvents.map(e => `
+                                    <div class="text-xs font-bold p-2 rounded-xl bg-pink-100 text-pink-800 border border-pink-200 flex items-center gap-1">
+                                        <i class="fa-solid fa-heart text-pink-400 text-[10px]"></i>
+                                        <span class="truncate">${e.title}</span>
+                                    </div>
+                                `).join('') : '<div class="text-[11px] text-pink-300 text-center py-2">よていなし</div>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            }
+        }
+
+        function renderRecurringSettingsList() {
+            const container = document.getElementById('recurringSettingsList');
+            container.innerHTML = '';
+            const schedule = appConfig.recurringSchedule || {};
+            for (let i = 0; i < 7; i++) {
+                const val = schedule[i] || '';
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-pink-100">
+                        <span class="font-bold text-pink-700 w-20">${HIRAGANA_WEEKDAYS[i]}</span>
+                        <input type="text" id="recurring_input_${i}" value="${val}" placeholder="くりかえしの よてい" class="bg-pink-50 border border-pink-200 rounded-lg px-2 py-1 text-xs w-full ml-2 text-pink-900">
+                    </div>
+                `);
+            }
+        }
+
+        document.getElementById('weatherToggleBtn').addEventListener('click', () => {
+            isManualWeatherMode = true;
+            isNightForecast = !isNightForecast;
+            updateWeatherUI();
+        });
+
+        document.getElementById('refreshTriviaBtn').addEventListener('click', getRandomTrivia);
+        document.getElementById('syncGCalBtn').addEventListener('click', fetchGoogleCalendarEvents);
+
+        const settingsModal = document.getElementById('settingsModal');
+        document.getElementById('openSettingsBtn').addEventListener('click', () => {
+            document.getElementById('settingApiKey').value = appConfig.apiKey || '';
+            document.getElementById('settingCalendarId').value = appConfig.calendarId || '';
+            document.getElementById('settingLat').value = appConfig.lat;
+            document.getElementById('settingLng').value = appConfig.lng;
+            document.getElementById('settingCityName').value = appConfig.cityName;
+            renderRecurringSettingsList();
+            settingsModal.classList.remove('hidden');
+        });
+        document.getElementById('closeSettingsModalBtn').addEventListener('click', () => settingsModal.classList.add('hidden'));
+
+        document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+            appConfig.apiKey = document.getElementById('settingApiKey').value.trim();
+            appConfig.calendarId = document.getElementById('settingCalendarId').value.trim();
+            appConfig.lat = parseFloat(document.getElementById('settingLat').value) || 36.5426;
+            appConfig.lng = parseFloat(document.getElementById('settingLng').value) || 140.4110;
+            appConfig.cityName = document.getElementById('settingCityName').value || 'ひたちおおみや';
+
+            if (!appConfig.recurringSchedule) appConfig.recurringSchedule = {};
+            for (let i = 0; i < 7; i++) {
+                const inputVal = document.getElementById(`recurring_input_${i}`).value;
+                appConfig.recurringSchedule[i] = inputVal;
+            }
+
+            localStorage.setItem('family_dash_config', JSON.stringify(appConfig));
+            settingsModal.classList.add('hidden');
+
+            fetchWeather();
+            fetchGoogleCalendarEvents();
+        });
+
+        document.getElementById('resetDataBtn').addEventListener('click', () => {
+            if (confirm('すべて データを リセットしますか？')) {
+                localStorage.removeItem('family_dash_config');
+                location.reload();
+            }
+        });
+
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => alert("全画面表示に失敗しました"));
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        window.onload = function () {
+            updateClock();
+            setInterval(updateClock, 1000);
+            getRandomTrivia();
+            fetchWeather();
+            fetchGoogleCalendarEvents();
+        };
+    </script>
+</body>
+</html>
