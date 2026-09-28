@@ -452,7 +452,7 @@
                             ${recurringText !== 'なし' && recurringText !== '' ? `
                                 <div class="bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold py-1 px-2 rounded-xl mb-2 flex items-center gap-1.5">
                                     <i class="fa-solid fa-arrows-rotate text-rose-400 text-xs"></i>
-                                    <span class="truncate">${recurringText}</span>
+                                    <span class="break-words">${recurringText}</span>
                                 </div>
                             ` : ''}
 
@@ -460,7 +460,7 @@
                                 ${dayEvents.length > 0 ? dayEvents.map(e => `
                                     <div class="text-xs font-bold p-2 rounded-xl bg-pink-100 text-pink-800 border border-pink-200 flex items-center gap-1">
                                         <i class="fa-solid fa-heart text-pink-400 text-[10px]"></i>
-                                        <span class="truncate">${e.title}</span>
+                                        <span class="break-words">${e.title}</span>
                                     </div>
                                 `).join('') : '<div class="text-[11px] text-pink-300 text-center py-2">よていなし</div>'}
                             </div>
